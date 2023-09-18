@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "binchew"
+version = "0.1.0"
+description = "A binary toolkit for interacting with process memory"
+authors = ["Valentin B. <valentin.be@protonmail.com>"]
+license = "ISC"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
