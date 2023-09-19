@@ -23,6 +23,17 @@ Types in OS memory are defined using variations of `Field`s. Each `Field`
 stores size, alignment for itself. Alignment can optionally be overridden
 by users.
 
+```py
+class StringData(Union):
+    ptr = Pointer(Char)
+    inline = Array(Char, size=0x10)
+
+class String(ObjectModel):
+    data = StringData()
+    length = Usize()
+    capacity = Usize()
+```
+
 ### Primitives
 
 The primitive integer types. Signed, unsigned, and IEEE-754 floats.
@@ -76,3 +87,15 @@ This might be slightly surprising, but every object is also a subclass of `Field
 can be used as such.
 
 The object in that case will be treated as an inline value.
+
+### Bitfields
+
+Types with an underlying primitive type, defining quantities of bits to be extracted
+out of it.
+
+## Transactions
+
+Issuing many syscalls to foreign process memory can be expensive; transaction should
+be supported to do many changes to the object at once.
+
+How this is going to look in practice is currently unspecified.

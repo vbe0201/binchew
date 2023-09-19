@@ -1,2 +1,2 @@
-from .hazmat import addrof  # noqa
+from .os import addrof, getpid  # noqa
 from .process import Process  # noqa
