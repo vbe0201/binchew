@@ -69,6 +69,7 @@ class RawProcess:
             Bears a risk of making the process behave unpredictably when misused.
 
         :param size: The size of the memory allocation to make.
+        :returns: The memory address of the allocation.
 
         :raises OSError: Failed to allocate the requested memory in the process.
         """
