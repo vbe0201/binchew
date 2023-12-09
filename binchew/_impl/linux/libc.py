@@ -21,10 +21,10 @@ def raise_errno_on_error():
         raise_errno(errno)
 
 
-def _checked_process_vm_result(res):
+def _checked_result(res):
     if res == -1:
         errno = ctypes.get_errno()
-        raise OSError(errno, os.strerror(errno))
+        raise_errno(errno)
     return res
 
 
@@ -37,13 +37,13 @@ _libc.mmap.argtypes = (
     ctypes.c_int,  # int fd
     ctypes.c_size_t,  # off_t offset
 )
-_libc.mmap.restype = ctypes.c_void_p
+_libc.mmap.restype = _checked_result
 
 _libc.munmap.argtypes = (
     ctypes.c_void_p,  # void *addr
     ctypes.c_size_t,  # size_t length
 )
-_libc.munmap.restype = ctypes.c_int
+_libc.munmap.restype = _checked_result
 
 # https://man7.org/linux/man-pages/man2/process_vm_readv.2.html
 _libc.process_vm_readv.argtypes = (
@@ -54,7 +54,7 @@ _libc.process_vm_readv.argtypes = (
     ctypes.c_ulong,  # unsigned long riovcnt
     ctypes.c_ulong,  # unsigned long flags
 )
-_libc.process_vm_readv.restype = _checked_process_vm_result
+_libc.process_vm_readv.restype = _checked_result
 
 _libc.process_vm_writev.argtypes = (
     ctypes.c_int,  # pid_t pid
@@ -64,7 +64,7 @@ _libc.process_vm_writev.argtypes = (
     ctypes.c_ulong,  # unsigned long riovcnt
     ctypes.c_ulong,  # unsigned long flags
 )
-_libc.process_vm_writev.restype = _checked_process_vm_result
+_libc.process_vm_writev.restype = _checked_result
 
 
 # https://man7.org/linux/man-pages/man3/iovec.3type.html

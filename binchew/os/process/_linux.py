@@ -92,9 +92,6 @@ class LinuxProcess(RawProcess):
                 0
             )
 
-            if addr == -1:
-                libc.raise_errno(ctypes.get_errno())
-
         else:
             addr = foreign_syscall(
                 self.pid,
@@ -116,9 +113,7 @@ class LinuxProcess(RawProcess):
 
     def free_memory(self, addr: int, size: int):
         if self.is_local:
-            res = libc.munmap(addr, size)
-            if res != 0:
-                libc.raise_errno(ctypes.get_errno())
+            libc.munmap(addr, size)
 
         else:
             # Since syscalls cannot use errno, we use a generic result message.
