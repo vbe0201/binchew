@@ -19,10 +19,6 @@ def ptrace_continue(pid: int):
     libc.checked_ptrace(libc.PTRACE_CONT, pid, None, None)
 
 
-def ptrace_interrupt(pid: int):
-    libc.checked_ptrace(libc.PTRACE_INTERRUPT, pid, None, None)
-
-
 def ptrace_get_regs(pid: int) -> libc.user_regs_struct:
     regs = libc.user_regs_struct()
     ptrace_update_regs(pid, regs)
