@@ -8,6 +8,7 @@ from binchew.os.process import RawProcess
 from binchew.typing import BytesLike
 
 from .errors import OutOfBounds
+from .layout import Layout
 
 
 class Permissions(IntFlag):
@@ -48,15 +49,25 @@ class MemoryBlock:
     necessary permissions are rejected.
     """
 
-    def __init__(self, proc: RawProcess, addr: int, size: int, perms: Permissions):
+    def __init__(self, proc: RawProcess, addr: int, layout: Layout, perms: Permissions):
         self._process = proc
 
         self.addr = addr
-        self.size = size
+        self.layout = layout
         self.perms = perms
 
     def __len__(self) -> int:
         return self.size
+
+    @property
+    def size(self) -> int:
+        """Gets the size of this memory block."""
+        return self.layout.size
+
+    @property
+    def align(self) -> int:
+        """Gets the alignment of this memory block."""
+        return self.layout.align
 
     def _deallocate(self):
         self._process.free_memory(self.addr, self.size)
