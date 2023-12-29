@@ -22,6 +22,9 @@ class Permissions(IntFlag):
     #: Memory at the pointer address is executable.
     EXECUTE = auto()
 
+    #: All permissions that can be granted.
+    ALL = READ | WRITE | EXECUTE
+
     @property
     def mmap_perms(self) -> int:
         """Gets the current permission set for use with mmap."""
