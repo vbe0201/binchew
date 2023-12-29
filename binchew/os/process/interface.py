@@ -1,3 +1,5 @@
+import os
+
 from binchew.typing import BytesLike
 
 
@@ -11,6 +13,7 @@ class RawProcess:
 
     def __init__(self, pid: int):
         self.pid = pid
+        self.is_local = pid == os.getpid()
 
     def read_memory(self, address: int, size: int) -> bytes:
         """
@@ -53,7 +56,7 @@ class RawProcess:
         """
         raise NotImplementedError()
 
-    def allocate_memory(self, size: int) -> int:
+    def allocate_memory(self, size: int, perms) -> int:
         """
         Allocates memory in the target process.
 
@@ -69,6 +72,7 @@ class RawProcess:
             Bears a risk of making the process behave unpredictably when misused.
 
         :param size: The size of the memory allocation to make.
+        :param perms: The permissions of the memory allocation.
         :returns: The memory address of the allocation.
 
         :raises OSError: Failed to allocate the requested memory in the process.

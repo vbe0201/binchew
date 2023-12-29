@@ -37,7 +37,7 @@ _libc.mmap.argtypes = (
     ctypes.c_int,  # int fd
     ctypes.c_size_t,  # off_t offset
 )
-_libc.mmap.restype = _checked_result
+_libc.mmap.restype = ctypes.c_void_p
 
 _libc.munmap.argtypes = (
     ctypes.c_void_p,  # void *addr
@@ -130,11 +130,17 @@ class user_regs_struct(ctypes.Structure):
         return copier(ctypes.byref(self))
 
 
-mmap = _libc.mmap
 munmap = _libc.munmap
 ptrace = _libc.ptrace
 process_vm_readv = _libc.process_vm_readv
 process_vm_writev = _libc.process_vm_writev
+
+
+def mmap(addr, length, prot, flags, fd, offset):
+    # XXX: This is necessary because setting _checked_result as the
+    # restype for mmap truncates the returned pointer to 32 bits.
+    res = _libc.mmap(addr, length, prot, flags, fd, offset)
+    return _checked_result(res)
 
 
 def checked_ptrace(request, pid, addr, data):

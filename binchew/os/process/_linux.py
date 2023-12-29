@@ -28,8 +28,6 @@ class LinuxProcess(RawProcess):
     def __init__(self, pid: int):
         super().__init__(pid)
 
-        self.is_local = pid == os.getpid()
-
     @classmethod
     def open(cls, pid: int) -> Self:
         # Ensure the requested process exists.
@@ -37,6 +35,7 @@ class LinuxProcess(RawProcess):
         return cls(pid)
 
     def read_memory(self, address: int, size: int) -> bytes:
+        # TODO: In local process, just do memmove.
         buf = ctypes.create_string_buffer(size)
 
         local = libc.iovec(ctypes.cast(ctypes.byref(buf), ctypes.c_void_p), size)
@@ -57,6 +56,7 @@ class LinuxProcess(RawProcess):
         return buf.raw
 
     def write_memory(self, address: int, buf: BytesLike) -> int:
+        # TODO: In local process, just do memmove.
         size = len(buf)
         buf = ffi.make_c_buffer(buf, size)
 
@@ -77,17 +77,18 @@ class LinuxProcess(RawProcess):
 
         return res
 
-    def allocate_memory(self, size: int) -> int:
-        # TODO: Allow variable permissions.
+    def allocate_memory(self, size: int, perms) -> int:
+        prot = perms.mmap_perms
+        flags = mmap.MAP_PRIVATE | mmap.MAP_ANONYMOUS
 
         if self.is_local:
             # NOTE: We can't use Python's `mmap.mmap` because it ignores
             # execute permission requests.
             addr = libc.mmap(
-                ctypes.c_void_p(0),
+                None,
                 size,
-                mmap.PROT_READ | mmap.PROT_WRITE,
-                mmap.MAP_PRIVATE | mmap.MAP_ANONYMOUS,
+                prot,
+                flags,
                 -1,
                 0
             )
@@ -98,8 +99,8 @@ class LinuxProcess(RawProcess):
                 libc.SYS_mmap,
                 0,
                 size,
-                mmap.PROT_READ | mmap.PROT_WRITE,
-                mmap.MAP_PRIVATE | mmap.MAP_ANONYMOUS,
+                prot,
+                flags,
                 -1,
                 0
             )
